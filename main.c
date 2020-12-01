@@ -22,9 +22,10 @@ int main(void) {
   insert_after(p, NULL, &d, sizeof(int));
   print(p, 'f');
   print(p, 'r');
-  delete_all(p);
+  reverse(p);
   print(p, 'f');
-  destruct(p);
+  print(p, 'r');
+  p = destruct(p);
   return 0;
 }
 

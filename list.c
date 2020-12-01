@@ -96,7 +96,7 @@ void print(list *this_list, const char flag) {
  * Allocated and initialize the new node.
  * Return its address if memory is allocated successfully or NULL otherwise.
  */
-static node *allocate_node(void *data, size_t size, node *succ, node *prev) {
+static node *__allocate_node(void *data, size_t size, node *succ, node *prev) {
   node *new_node = NULL;
   if ((new_node = (node *)malloc(sizeof(node)))) {
     if ((new_node->data = (void *)malloc(size))) {
@@ -120,7 +120,7 @@ static node *allocate_node(void *data, size_t size, node *succ, node *prev) {
  * Check wether the node present in the list or not.
  * If it present then return true or false otherwise.
  */
-static bool is_node_present_in_list(list *this_list, node *this_node) {
+static bool __is_node_present_in_list(list *this_list, node *this_node) {
   if (this_list) {
     node *trav = this_list->beg;
     while (trav) {
@@ -149,7 +149,7 @@ int insert_before(list *this_list, node *this_node, void *data, size_t size) {
       // List does not content a single node.
       // Inserting its first node.
       node *new_node = NULL;
-      if ((new_node = allocate_node(data, size, NULL, NULL))) {
+      if ((new_node = __allocate_node(data, size, NULL, NULL))) {
         this_list->beg = new_node;
         this_list->end = new_node;
         ++this_list->size;
@@ -158,10 +158,10 @@ int insert_before(list *this_list, node *this_node, void *data, size_t size) {
     } else {
       if (this_node && this_node != this_list->beg) {
         // Inserting new node before the specified node.
-        if (is_node_present_in_list(this_list, this_node)) {
+        if (__is_node_present_in_list(this_list, this_node)) {
           node *new_node = NULL;
           if ((new_node =
-                   allocate_node(data, size, this_node, this_node->prev))) {
+                   __allocate_node(data, size, this_node, this_node->prev))) {
             this_node->prev->succ = new_node;
             this_node->prev = new_node;
             if (this_node == this_list->beg) {
@@ -178,7 +178,7 @@ int insert_before(list *this_list, node *this_node, void *data, size_t size) {
       } else {
         // Inserting new node at the beginning of the list.
         node *new_node = NULL;
-        if ((new_node = allocate_node(data, size, this_list->beg, NULL))) {
+        if ((new_node = __allocate_node(data, size, this_list->beg, NULL))) {
           this_list->beg->prev = new_node;
           this_list->beg = new_node;
           ++this_list->size;
@@ -230,7 +230,7 @@ node *node_at_index(list *this_list, size_t index) {
 node *get_prev(list *this_list, node *this_node) {
   if (this_list) {
     if (this_list->beg) {
-      if (is_node_present_in_list(this_list, this_node)) {
+      if (__is_node_present_in_list(this_list, this_node)) {
         return this_node->prev;
       }
     } else {
@@ -254,7 +254,7 @@ node *get_prev(list *this_list, node *this_node) {
 node *get_succ(list *this_list, node *this_node) {
   if (this_list) {
     if (this_list->beg) {
-      if (is_node_present_in_list(this_list, this_node)) {
+      if (__is_node_present_in_list(this_list, this_node)) {
         return this_node->succ;
       }
     } else {
@@ -344,7 +344,7 @@ int insert_after(list *this_list, node *this_node, void *data, size_t size) {
       // List is emtpy.
       // Inserting its first element.
       node *new_node = NULL;
-      if ((new_node = allocate_node(data, size, NULL, NULL))) {
+      if ((new_node = __allocate_node(data, size, NULL, NULL))) {
         this_list->beg = new_node;
         this_list->end = new_node;
         ++this_list->size;
@@ -352,10 +352,10 @@ int insert_after(list *this_list, node *this_node, void *data, size_t size) {
       }
     } else if (this_node && this_node != this_list->end) {
       // Inserting after the specified node present in the list.
-      if (is_node_present_in_list(this_list, this_node)) {
+      if (__is_node_present_in_list(this_list, this_node)) {
         node *new_node = NULL;
         if ((new_node =
-                 allocate_node(data, size, this_node->succ, this_node))) {
+                 __allocate_node(data, size, this_node->succ, this_node))) {
           this_node->succ->prev = new_node;
           this_node->succ = new_node;
           ++this_list->size;
@@ -369,7 +369,7 @@ int insert_after(list *this_list, node *this_node, void *data, size_t size) {
     } else {
       // Inserting at end of the list.
       node *new_node = NULL;
-      if ((new_node = allocate_node(data, size, NULL, this_list->end))) {
+      if ((new_node = __allocate_node(data, size, NULL, this_list->end))) {
         this_list->end->succ = new_node;
         this_list->end = new_node;
         ++this_list->size;
@@ -421,7 +421,7 @@ int delete_current(list *this_list, node *this_node) {
         return 0;
       } else {
         // Node to be deleted is present in between begin and end of the list.
-        if (is_node_present_in_list(this_list, this_node)) {
+        if (__is_node_present_in_list(this_list, this_node)) {
           this_node->prev->succ = this_node->succ;
           this_node->succ->prev = this_node->prev;
           free(this_node->data);
@@ -490,5 +490,30 @@ size_t get_size(list *this_list) {
     construct_list_error(
         "trying to find the size of the list does not make any sense...");
   }
+  return 0;
+}
+/**
+ * Traverses the list recusively and reverse the list.
+ * It will make beg point to currently last node of the list and end points to
+ * currently first node of the list.
+ * However it will not make the prev member of newly first node to NULL.
+ */
+static node *__reverse(list *this_list, node *trav) {
+  this_list->beg = trav;
+  if (trav->succ) {
+    node *temp = __reverse(this_list, trav->succ);
+    temp->succ = trav;
+    trav->prev = temp;
+  }
+  trav->succ = NULL;
+  this_list->end = trav;
+  return trav;
+}
+/**
+ * Reverse the list.
+ */
+int reverse(list *this_list) {
+  __reverse(this_list, this_list->beg);
+  this_list->beg->prev = NULL;
   return 0;
 }

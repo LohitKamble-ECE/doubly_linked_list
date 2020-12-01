@@ -28,6 +28,7 @@ extern int insert_after(list *this_list, node *this_node, void *data,
                         size_t size);
 extern int delete_current(list *this_list, node *this_node);
 extern int delete_all(list *this_list);
+extern int reverse(list *this_list);
 extern node *node_at_index(list *this_list, size_t index);
 extern node *find_key(list *this_list, void *data);
 extern node *get_prev(list *this_list, node *this_node);
