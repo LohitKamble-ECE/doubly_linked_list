@@ -517,3 +517,44 @@ int reverse(list *this_list) {
   this_list->beg->prev = NULL;
   return 0;
 }
+
+/**
+ * Insert the new node in an ascending order.
+ * If list is empty then inserting new node at the head of the list.
+ */
+int push_ascending(list *this_list, void *data, size_t size) {
+  if (this_list) {
+    node *trav = this_list->beg;
+    while (trav) {
+      if (this_list->compare(trav->data, data) >= 0) {
+        insert_before(this_list, trav, data, size);
+        return 0;
+      }
+    }
+    insert_after(this_list, NULL, data, size);
+  } else {
+    construct_list_error(
+        "trying to push node into it does not make any sense...");
+  }
+  return 0;
+}
+/**
+ * Insert the new node in an descending order.
+ * If list is empty then inserting new node at the head of the list.
+ */
+int push_descending(list *this_list, void *data, size_t size) {
+  if (this_list) {
+    node *trav = this_list->beg;
+    while (trav) {
+      if (this_list->compare(trav->data, data) <= 0) {
+        insert_before(this_list, trav, data, size);
+        return 0;
+      }
+    }
+    insert_after(this_list, NULL, data, size);
+  } else {
+    construct_list_error(
+        "trying to push node into it does not make any sense...");
+  }
+  return 0;
+}

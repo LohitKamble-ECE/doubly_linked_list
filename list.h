@@ -26,6 +26,8 @@ extern int insert_before(list *this_list, node *this_node, void *data,
                          size_t size);
 extern int insert_after(list *this_list, node *this_node, void *data,
                         size_t size);
+extern int push_ascending(list *this_list, void *data, size_t size);
+extern int push_descending(list *this_list, void *data, size_t size);
 extern int delete_current(list *this_list, node *this_node);
 extern int delete_all(list *this_list);
 extern int reverse(list *this_list);
